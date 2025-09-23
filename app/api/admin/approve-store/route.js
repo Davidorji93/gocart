@@ -29,7 +29,7 @@ export async function POST(request) {
 
     return NextResponse.json(
       { message: status + " successfully" },
-      { status: 500 }
+      { status: 200 }
     );
   } catch (error) {
     console.error(error);
