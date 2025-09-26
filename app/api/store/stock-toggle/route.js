@@ -1,12 +1,13 @@
 import { getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import authSeller from "@/middlewares/authSeller";
+import prisma from "@/lib/prisma";
 
 // toggle stock of a product
 export async function POST(request) {
   try {
     const { userId } = getAuth(request);
-    const productId = await request.json();
+    const { productId } = await request.json();
 
     if (!productId) {
       return NextResponse.json(
@@ -26,28 +27,27 @@ export async function POST(request) {
 
     // check if product exists
     const product = await prisma.product.findFirst({
-      where: { id: productId, storeId: storeId },
+      where: { id: productId, storeId },
     });
 
     if (!product) {
       return NextResponse.json({ error: "No product found" }, { status: 404 });
     }
 
-    await prisma.product.update({
+    // toggle stock
+    const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: { inStock: !product.inStock },
     });
 
-    if (!product) {
-      return NextResponse.json(
-        { message: "Product stock updated successfully" },
-        { status: 404 }
-      );
-    }
+    return NextResponse.json({
+      message: "Product stock updated successfully",
+      product: updatedProduct,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Stock toggle error:", error);
     return NextResponse.json(
-      { error: error.code || error.message },
+      { error: error.message || "Something went wrong" },
       { status: 500 }
     );
   }

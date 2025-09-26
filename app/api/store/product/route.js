@@ -93,7 +93,7 @@ export async function GET(request) {
       where: { storeId },
     });
     
-    return NextResponse.json(products, { status: 201 });
+    return NextResponse.json(products, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
