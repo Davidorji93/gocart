@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import authSeller from "@/middlewares/authSeller";
-import prisma from "@/lib/prisma";
+import {prisma} from "@/lib/prisma";
 
 // Get dashboard data for seller (total orders, total earnings, total products)
 export async function GET(request) {
