@@ -1,9 +1,10 @@
-import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma"; 
 
 export async function GET(request) {
   try {
     let products = await prisma.product.findMany({
-      where: { isStock: true },
+      where: { inStock: true },
       include: {
         rating: {
           select: {
@@ -18,13 +19,15 @@ export async function GET(request) {
       orderBy: { createdAt: "desc" },
     });
 
-    // remove products with store isActive false
+    // filter out inactive stores
     products = products.filter((product) => product.store?.isActive);
-    return NextResponse(products, { status: 200 });
+
+    return NextResponse.json({ products }, { status: 200 });
   } catch (error) {
+    console.error("API error fetching products:", error);
     return NextResponse.json(
-          { error: error.message || "Something went wrong" },
-          { status: 500 }
-        );  
+      { error: error.message || "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
